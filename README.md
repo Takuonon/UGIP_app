@@ -1,4 +1,4 @@
-#車椅子・スーツケース・ベビーカートラッキング装置
+# 車椅子・スーツケース・ベビーカートラッキング装置
 
 # Object Detection with Yolo v4 and Streamlit
 
