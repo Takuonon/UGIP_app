@@ -28,24 +28,24 @@ def detect_object(frame):
     #boxes: ボックス(左上x座標、左上y座標、幅、高さ)
     classes, confidences, boxes = net.detect(frame, confThreshold=0.1, nmsThreshold=0.4)
 
-    # for classId, confidence, box in zip(classes.flatten(), confidences.flatten(), boxes):
+    for classId, confidence, box in zip(classes.flatten(), confidences.flatten(), boxes):
     #     print(classId, confidence, box)
-    #     label = '%.2f' % confidence
-    #     label = '%s: %s' % (names[classId], label)
-    #     labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1) # fontScale: 0.5, thickness: 1
-    #     # print(labelSize, baseLine)
-    #     left, top, width, height = box
-    #     # print("T:", top)
-    #     top = max(top, labelSize[1])
-    #     # print("MT:", top)
-    #     cv2.rectangle(frame, box, color=(0, 255, 0), thickness=3)
-    #     # Draw rectangle for labels
-    #     cv2.rectangle(frame, (left, top - labelSize[1]), (left + labelSize[0], top + baseLine),
-    #                   (255, 255, 255), cv2.FILLED)
-    #     cv2.putText(frame, label, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
+        label = '%.2f' % confidence
+        label = '%s: %s' % (names[classId], label)
+        labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1) # fontScale: 0.5, thickness: 1
+        # print(labelSize, baseLine)
+        left, top, width, height = box
+        # print("T:", top)
+        top = max(top, labelSize[1])
+        # print("MT:", top)
+        cv2.rectangle(frame, box, color=(0, 255, 0), thickness=3)
+        # Draw rectangle for labels
+        cv2.rectangle(frame, (left, top - labelSize[1]), (left + labelSize[0], top + baseLine),
+                      (255, 255, 255), cv2.FILLED)
+        cv2.putText(frame, label, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
 
     # return frame
-    return classes, confidences, boxes
+    return classes, confidences, boxes, frame
 
 
 # def track_objects(frames):
@@ -108,98 +108,6 @@ def detect_object(frame):
 #     cv2.destroyAllWindows()
 #     return frames
 
-def track_objects(frames):
-    print(cv2.__version__)
-
-    # # 追跡対象の初期位置を取得
-    # bbox_initial = cv2.selectROI("Tracking", frames[0], False)
-
-    #箱付きのiamgeを格納してく配列
-    results_image = np.empty((len(frames),704, 704, 3))
-
-    #入力のサイズを調整   
-    frame = cv2.resize(frames[0], dsize=(704, 704), interpolation=cv2.INTER_AREA)
-
-
-   
-    classes, confidences, boxes = detect_object(frame)
-    
-    # 追跡器を作成し、最初の位置で初期化
-    tracker = cv2.TrackerKCF_create()
-    bbox_init = tuple(map(int, boxes[0]))
-    # print(bbox_init)
-    tracker.init(frame, bbox_init)
-
-    cv2.rectangle(frame, bbox_init, color=(0, 255, 0), thickness=3)
-    results_image[0] = frame
-    
-    print(frame)
-    print(results_image[0])
-
-    
-    # 追跡結果を保存するリスト
-    #resultsはboxの座標を格納する配列
-    results = []
-    results.append(bbox_init)
-    
-    # # iouのしきい値
-    # iou_threshold = 0.5
-
-    print(len(frames))
-    
-    # # フレームごとに処理を実行
-    # for i in range(1, 5):
-        
-    #     print(i)
-
-    #     # 検出器で物体検出を実行
-    #     classes, confidences, boxes = detect_object(frames[i])
-
-    #     print(boxes)
-    #     print("len_boxes", len(boxes))
-        
-    #     # 検出がなければ、前回の追跡結果を使用する
-    #     if len(boxes) == 0:
-    #         bbox = results[i - 1]
-    #     else:
-    #         # iouが最も高い検出を選択
-    #         bbox = None
-    #         max_iou = 0
-            
-    #         for box in boxes:
-    #             iou = intersection_over_union(results[i - 1], box)
-                
-    #             if iou > max_iou and iou > iou_threshold:
-    #                 bbox = box
-
-    #                 max_iou = iou
-            
-    #         # iouがしきい値未満の場合は前回の追跡結果を使用する
-    #         if bbox is None:
-    #             bbox = results[i - 1]
-
-    #         print(bbox)
-
-    for i in range(1, 5):
-        # 追跡器で位置を更新し、結果を保存する
-        ok, bbox = tracker.update(frames[i])
-        print(ok)
-        print(bbox)
-        if ok:
-            results.append(bbox)
-            print("here")
-        else:
-            results.append(results[i - 1])
-    
-        # 追跡結果をフレームに描画する
-        bbox = tuple(map(int, bbox))
-        frame_new = cv2.resize(frames[i], dsize=(704, 704), interpolation=cv2.INTER_AREA)
-        print(bbox)
-        cv2.rectangle(frame_new, bbox, color=(0, 255, 0), thickness=3)
-        results_image[i] = frame_new
-
-    return results, results_image
-
 def get_first_frame(cap):
     #TODO このせいでtrack_objectで読み込むフレームのスタート位置がズレてるかも
     if not cap.isOpened():
@@ -209,13 +117,15 @@ def get_first_frame(cap):
     if not ok:
         print ('Cannot read video file')
         sys.exit()
-    return frame
+    detected_object = detect_object(frame)
+    resized_frame = convert_frame(detected_object[3], frame.shape)
+    return resized_frame
     
 
 
 
 
-def track_object2(cap):
+def track_object2(cap, space):
     tracker = cv2.TrackerKCF_create()
         # Exit if video not opened.
     if not cap.isOpened():
@@ -229,8 +139,8 @@ def track_object2(cap):
         sys.exit()
 
     #箱付きのiamgeを格納してく配列
-    #TODO このmax_framesはどっかでわかりやすく定義するのがいいかも
     frames = np.empty((50000,704, 704, 3))
+    boxes_result = np.empty((50000,4))
 
     #サイズの取得
     initial_size = frame.shape
@@ -239,7 +149,7 @@ def track_object2(cap):
     #入力のサイズを調整   
     frame_initial = cv2.resize(frame, dsize=(704, 704), interpolation=cv2.INTER_AREA)
 
-    classes, confidences, boxes = detect_object(frame_initial)
+    classes, confidences, boxes, frame_do_not_use = detect_object(frame_initial)
     bbox = boxes[0]
     ok = tracker.init(frame_initial, bbox)
     i = 0
@@ -266,7 +176,7 @@ def track_object2(cap):
             # Tracking success
             p1 = (int(bbox[0]), int(bbox[1]))
             p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
-            cv2.rectangle(frame, p1, p2, (255,0,0), 2, 1)
+            cv2.rectangle(frame, p1, p2, (0,255,0), thickness=3)
         else :
             # Tracking failure
             cv2.putText(frame, "Tracking failure detected", (100,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
@@ -278,6 +188,16 @@ def track_object2(cap):
         cv2.putText(frame, "FPS : " + str(int(fps)), (100,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50), 2)
 
         frames[i] = frame
+        boxes_result[i] = np.array(bbox)
+
+        if i%4 == 0:
+            space.write("処理中です")
+        if i%4 == 1:
+            space.write("処理中です・")
+        if i%4 == 2:
+            space.write("処理中です・・")  
+        if i%4 == 3:
+            space.write("処理中です・・・") 
         i +=1
  
 
@@ -285,9 +205,19 @@ def track_object2(cap):
         # # Display result
         # cv2.imshow("Tracking", frame)
 
-    return frames, i, initial_size
+    return frames, i, initial_size, boxes_result
 
-    
+def convert_frame(frame, initial_size):
+            # float64の場合、ビット深度を変換(if文は念のため)
+    if frame.dtype == np.float64:
+        if np.max(frame) <= 1.0:
+            frame = (frame * 255.0).astype(np.uint8)
+        else:
+            frame = frame.astype(np.uint8)
+
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)   
+    resized_frame = cv2.resize(frame, (initial_size[1],initial_size[0]), interpolation=cv2.INTER_AREA)
+    return resized_frame    
 
 
 
