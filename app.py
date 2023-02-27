@@ -18,6 +18,9 @@ def get_style():
 css = get_style()
 st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
+points = []
+
+
 def main():
 
     with st.container():
@@ -71,7 +74,7 @@ def main():
 
             if line_mode == "その他":
                 x = st.sidebar.slider('位置', 0, 100, 50)  
-                arg = st.sidebar.slider('角度', -180, 0, 95)
+                arg = st.sidebar.slider('角度', -180, 0, -125)
                 #視覚的なわかりやすさのためにこうした
                 arg += 180
                 #arg == 90 の時は垂直と同じ操作
@@ -82,6 +85,8 @@ def main():
                     first_frame = first_frame.astype(np.uint8)
                     cv2.line(first_frame, (x_actual, 0), (x_actual, h), color, thickness=2)
                     left_column.image(first_frame,use_column_width=True)
+                    x1 = x_actual
+                    y1 = h
                 
                 #arg == 0,180 の時は水平と同じ操作
                 elif arg == 0 or arg == 180:
@@ -90,8 +95,9 @@ def main():
                     y_actual = int(h * x /100)
                     first_frame = first_frame.astype(np.uint8)
                     cv2.line(first_frame, (0, y_actual), (w, y_actual), color, thickness=2)
-                    y1 = y_actual
                     left_column.image(first_frame,use_column_width=True)
+                    x1 = w
+                    y1 = y_actual
 
                 elif arg < 90:
                     first_frame = get_first_frame(cap)
@@ -101,7 +107,7 @@ def main():
                     first_frame = first_frame.astype(np.uint8)
                     y_intercept = int(np.tan(np.radians(arg)) * x_actual)
                     cv2.line(first_frame, (0, y_intercept), (x_actual, 0), color, thickness=2)
-                    y1 = y_actual
+                    y1 = y_intercept
                     left_column.image(first_frame,use_column_width=True)
 
                 elif arg > 90:
@@ -123,20 +129,34 @@ def main():
                 #     time.sleep(1)
 
 
-
-
-
-                
-
-
-                
-
         elif mode == "長方形":
         # モード2の処理
             st.sidebar.write("領域は「長方形」で指定できます")
-        else:
-        # モード3の処理
-            st.sidebar.write("領域タイプを選択して下さい")
+            first_frame = get_first_frame(cap)
+            h, w= first_frame.shape[:2]
+            # x_actual = int(w * x /100)
+            first_frame = first_frame.astype(np.uint8)
+
+            st.image(first_frame, channels="BGR")
+
+            # 画像上にマウスイベントのコールバックを設定
+            cv2.namedWindow(first_frame)
+            cv2.setMouseCallback("first_frame", mouse_callback)
+
+            # メインループ
+            while True:
+                # 画像を表示
+                cv2.imshow("first_frame", first_frame)
+
+                # キー入力を待つ
+                key = cv2.waitKey(1) & 0xFF
+
+                 # "q"キーが押されたらループを終了
+                if key == ord("q"):
+                    break
+            
+            cv2.destroyAllWindows()
+            print(points)        
         
         image_space = right_column.empty()
         frames, frames_len ,initial_size, boxes= track_object2(cap,image_space)
@@ -213,7 +233,14 @@ def upload_video_ui():
         else:
             return cap
 
-
+# マウスイベント用のコールバック関数
+def mouse_callback(event, x, y, flags, params):
+    if event == cv2.EVENT_LBUTTONUP:
+        # マウスの左ボタンが離された場合、クリックした座標を取得
+        points.append((x, y))
+        if len(points) == 4:
+            # 4点が選択された場合、4点の座標を表示
+            st.write("Selected points:", points)
 
 
 if __name__ == '__main__':

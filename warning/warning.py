@@ -16,7 +16,7 @@ def warning_line(line_mode,x_actual,y_actual,boxes,i,initial_size,judge_space,x1
         else:
             judge_space.write("異常はありません")
 
-    if line_mode == "水平":
+    elif line_mode == "水平":
         if (y_actual - (box_prev[1]+ box_prev[3]/2) )*(y_actual - (box_after[1]+box_prev[3]/2 )) <= 0:
             judge_space.write("<font color='red'>設定した線を超えました</font>", unsafe_allow_html=True)
             time.sleep(3)

@@ -48,66 +48,6 @@ def detect_object(frame):
     return classes, confidences, boxes, frame
 
 
-# def track_objects(frames):
-#     #trackerの作成
-#     print(cv2.__version__)
-#     tracker = cv2.TrackerCSRT_create()
-
-#     detections = {}
-#     #trackするもんに関して足してく
-#     current_id = 0
-#     fps = 0
-
-# #ここでframesの長さを渡したい
-#     for i in range(10):
-#         tracked_boxes = []
-#         frame = frames[i]
-#         classes, confidences, boxes = detect_object(frame)
-#         for box in boxes:
-#             tracked = False
-#             for id, detection in detections.items():
-#                 # 過去の検出結果と現在の検出結果を比較して、物体を追跡
-#                 iou = intersection_over_union(box, detection["box"])
-#                 if iou > 0.5:
-#                     tracker.update(frame)
-#                     tracked = True
-#                     tracker_box = tracker.getObjects()[-1]
-#                     tracked_boxes.append(tracker_box)
-#                     detections[id]["box"] = tracker_box
-#                     detections[id]["confidence"] = confidences[boxes.index(box)]
-#                     detections[id]["age"] += 1
-#                     break
-#                 if not tracked:
-#                 # 新規検出結果を追加
-#                     id = current_id
-#                     current_id += 1
-#                     tracker.add(cv2.TrackerKCF_create(), frame, box)
-#                     detections[id] = {"box": box, "confidence": confidences[boxes.index(box)], "age": 1}
-#                     tracked_boxes.append(box)
-
-#         # # 古い検出結果を削除
-#         # #ここがよく分からない
-#         # deleted_ids = []
-#         # for id, detection in detections.items():
-#         #     if detection["age"] > max_age:
-#         #         deleted_ids.append(id)
-#         # for id in deleted_ids:
-#         #     del detections[id]
-
-#         # 検出結果を表示
-#         for id, detection in detections.items():
-#             x, y, w, h = detection["box"]
-#             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-#             text = f"{classes[classes[boxes.index(detection['box'])]]}: {detection['confidence']:.2f}"
-#             cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
-
-#         # framesをボックスがついてるバージョンに入れ替え
-#         frames[i] = frame
-
-#     # 後処理
-#     cv2.destroyAllWindows()
-#     return frames
-
 def get_first_frame(cap):
     #TODO このせいでtrack_objectで読み込むフレームのスタート位置がズレてるかも
     if not cap.isOpened():
@@ -182,7 +122,7 @@ def track_object2(cap, space):
             cv2.putText(frame, "Tracking failure detected", (100,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
  
         # Display tracker type on frame
-        cv2.putText(frame, "ooo" + " Tracker", (100,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
+        cv2.putText(frame, "KCF" + " Tracker", (100,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
      
         # Display FPS on frame
         cv2.putText(frame, "FPS : " + str(int(fps)), (100,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50), 2)
