@@ -6,6 +6,7 @@ import cv2
 from PIL import Image, ImageOps
 from detection.object_detection import track_object2, get_first_frame, convert_frame
 from warning.warning import warning_line
+import matplotlib.pyplot as plt
 
 #赤
 color = (255, 0, 0) 
@@ -137,27 +138,16 @@ def main():
             # x_actual = int(w * x /100)
             first_frame = first_frame.astype(np.uint8)
 
-            st.image(first_frame, channels="BGR")
+            # Matplotlibのイベントを有効にし、画像上でマウスクリックイベントを取得する
+            fig = plt.figure()
+            plt.imshow(np.array(first_frame))
+            plt.axis('off')
+            cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
-            # 画像上にマウスイベントのコールバックを設定
-            cv2.namedWindow(first_frame)
-            cv2.setMouseCallback("first_frame", mouse_callback)
-
-            # メインループ
-            while True:
-                # 画像を表示
-                cv2.imshow("first_frame", first_frame)
-
-                # キー入力を待つ
-                key = cv2.waitKey(1) & 0xFF
-
-                 # "q"キーが押されたらループを終了
-                if key == ord("q"):
-                    break
+            # MatplotlibのFigureオブジェクトをStreamlitのUIに表示する
+            st.pyplot(fig)
             
-            cv2.destroyAllWindows()
-            print(points)        
-        
+             
         image_space = right_column.empty()
         frames, frames_len ,initial_size, boxes= track_object2(cap,image_space)
 
@@ -241,6 +231,15 @@ def mouse_callback(event, x, y, flags, params):
         if len(points) == 4:
             # 4点が選択された場合、4点の座標を表示
             st.write("Selected points:", points)
+
+# 画像上でマウスをクリックしたときのイベントを処理する関数を作成する
+def onclick(event):
+    if len(points) < 4:
+        points.append((event.xdata, event.ydata))
+        plt.plot(event.xdata, event.ydata, 'ro')
+        plt.draw()
+        # 座標を表示する
+        st.text(points)
 
 
 if __name__ == '__main__':

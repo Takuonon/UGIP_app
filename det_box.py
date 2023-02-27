@@ -52,8 +52,8 @@ from utils.torch_utils import select_device, smart_inference_mode
 
 @smart_inference_mode()
 def run(
-        weights=ROOT / 'yolov5s.pt',  # model path or triton URL
-        source=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
+        weights='weights_folder/best.pt',  # model path or triton URL
+        source='images/013238.bmp',  # file/dir/URL/glob/screen/0(webcam)
         data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
         imgsz=(640, 640),  # inference size (height, width)
         conf_thres=0.25,  # confidence threshold
@@ -156,7 +156,8 @@ def run(
                 print("det = ", det)
                 print("save_txt = ", save_txt)
                 
-                return det #det =  tensor([[216.00000, 320.00000, 401.00000, 611.00000,   0.84399,   0.00000]], device='cuda:0')
+                #x y x y score class
+                return det #det =  tensor([[216.00000, 320.00000, 401.00000, 611.00000,   0.84399,   0.00000]], device='cuda:0')　
             
             """
                 # Print results

@@ -1,8 +1,67 @@
-import cv2
-import numpy as np
 import os
 import sys
-import streamlit as st
+import tempfile
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+from det_box import run
+
+def detect_object2(frame):
+# 画像を一時ファイルに保存
+#変数の宣言
+    x1 = 0
+    y1 = 0
+    x2 = 0
+    y2 = 0
+    confidence = 0
+
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_file:
+        plt.imsave(tmp_file.name, frame)
+        tmp_file.flush()
+        det = run(source=tmp_file.name) 
+    
+    x1 = det[0][0]
+    y1 = det[0][1]
+    x2 = det[0][2]
+    y2 = det[0][3]
+    confidence = det[0][4]
+
+    # 一時ファイルを削除
+    os.unlink(tmp_file.name)
+
+    box = np.array([x1, y1, x2 - x1, y2 - y1])
+    label = '%.2f' % confidence
+    label = '%s: %s' % ("wheelchair", label)
+    labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1) # fontScale: 0.5, thickness: 1
+    # print(labelSize, baseLine)
+    left, top, width, height = box
+    print("box",box)
+    print(box[0])
+    print(box[1])
+    print(box[2])
+    print(box[3])
+    print(left)
+    print(top)
+    print(width)
+    print(height)            
+    # print("T:", top)
+    top = max(top, labelSize[1])
+    # print("MT:", top)
+    print(box)
+    print(box.shape)
+    cv2.rectangle(frame, (int(box[0]), int(box[1])),(int(x2),int(y2)), color=(0, 255, 0), thickness=3)
+    # Draw rectangle for labels
+    print("here",top - labelSize[1])
+
+    cv2.rectangle(frame, (int(left), int(top - labelSize[1])), (int(left + labelSize[0]), int(top + baseLine)),(255, 255, 255), cv2.FILLED)
+    cv2.putText(frame, label, (int(left), int(top)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
+
+    return confidence, box, frame
+    
+
+
 
 #arrayにした画像(frame)が引数
 def detect_object(frame):
@@ -57,16 +116,13 @@ def get_first_frame(cap):
     if not ok:
         print ('Cannot read video file')
         sys.exit()
-    detected_object = detect_object(frame)
-    resized_frame = convert_frame(detected_object[3], frame.shape)
+    detected_object = detect_object2(frame)
+    resized_frame = convert_frame(detected_object[2], frame.shape)
     return resized_frame
     
 
-
-
-
 def track_object2(cap, space):
-    tracker = cv2.TrackerKCF_create()
+    tracker = cv2.TrackerMIL_create()
         # Exit if video not opened.
     if not cap.isOpened():
         print ("Could not open video")
@@ -89,9 +145,11 @@ def track_object2(cap, space):
     #入力のサイズを調整   
     frame_initial = cv2.resize(frame, dsize=(704, 704), interpolation=cv2.INTER_AREA)
 
-    classes, confidences, boxes, frame_do_not_use = detect_object(frame_initial)
-    bbox = boxes[0]
-    ok = tracker.init(frame_initial, bbox)
+    confidences, box, frame_do_not_use = detect_object2(frame_initial)
+    # bbox = boxes[0]
+    print("boxhere",box)
+    ok = tracker.init(frame_initial, (int(box[0]),int(box[1]),int(box[2]),int(box[3])))
+
     i = 0
 
     while True:
