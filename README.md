@@ -1,19 +1,17 @@
-# 車椅子・スーツケース・ベビーカートラッキング装置
+# RailSentry
 
-# Object Detection with Yolo v4 and Streamlit
+## 概要
 
-Paper YOLO v4: https://arxiv.org/abs/2004.10934
+監視カメラの映像から**車椅子の線路への侵入・転落を検出する AI**を搭載した、Web アプリケーション**RailSentry**を開発しました。立入禁止領域を設定することで、そこに立ち入った車椅子を検出することができます。
 
-You should download 'yolov4.weights' file 245 MB: [yolov4.weights](https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights) (Google-drive mirror [yolov4.weights](https://drive.google.com/open?id=1cewMfusmPjYWbrnuJRuKhPMwRe_b9PaT))
+## 概観
 
-## Object Detection
+![Alt Text](overview.gif)
 
-![object_detection](./object_detection.PNG)
+## 基本的な構成
 
-## Start Streamlit
+![Alt Text](Flowchart.jpg)
 
-Type below on your terminal to run Streamlit and check the result of object detection with Streamlit.
+## その他
 
-```
-streamlit run app.py
-```
+詳細はモックアップ資料をご確認下さい
