@@ -14,4 +14,15 @@
 
 ## その他
 
-詳細はモックアップ資料をご確認下さい
+best.pt、yolo4.weights は以下のリンクからダウンロードが可能です
+
+- https://drive.google.com/drive/folders/1MheAP7o6INpj1pKUrp8CCwCZXJecN9ZQ?usp=sharing
+
+また、
+
+- weights_folder/best.pt
+- yolo/yolov4.weights
+
+となるようにそれぞれ配置して下さい。
+
+その他詳細はモックアップ資料をご確認下さい
