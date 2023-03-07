@@ -1,2 +1,4 @@
 pytorch_env
 *.pyc
+weights_folder/best.pt
+yolo/yolov4.weights
