@@ -3,9 +3,8 @@ import time
 import tempfile
 import numpy as np
 import cv2
-from PIL import Image, ImageOps
 from detection.object_detection import track_object2, get_first_frame, convert_frame
-from warning.warning import warning_line
+from warning.warning import warning_line, warning_rectangle
 import matplotlib.pyplot as plt
 
 #赤
@@ -15,22 +14,22 @@ def get_style():
     with open("./css/design.css") as f:
         return f.read()
 
-#cssで装飾
-css = get_style()
-st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+# #cssで装飾
+# css = get_style()
+# st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
 points = []
+
 
 
 def main():
 
     with st.container():
-        st.header("モックアップ")
+        st.header("RailSentry")
     status_space = st.sidebar.empty()
-    status_space.subheader("動画をアップロードして下さい")
+    status_space.write("動画をアップロードして下さい")
     
     cap = upload_video_ui()
-    print(cap)
     
     if cap is not None:
         status_space.subheader("動画のアップロードが完了しました")
@@ -43,6 +42,8 @@ def main():
         line_mode = ""
         x_actual = 0
         y_actual = 0
+        width_actual = 0
+        height_actual = 0
         x1 = 0
         y1 = 0
 
@@ -60,7 +61,7 @@ def main():
                 h, w= first_frame.shape[:2]
                 x_actual = int(w * x /100)
                 first_frame = first_frame.astype(np.uint8)
-                cv2.line(first_frame, (x_actual, 0), (x_actual, h), color, thickness=2)
+                cv2.line(first_frame, (x_actual, 0), (x_actual, h), color, thickness=5)
                 left_column.image(first_frame,use_column_width=True)
 
             if line_mode == "水平":  
@@ -69,7 +70,7 @@ def main():
                 h, w= first_frame.shape[:2]
                 y_actual = int(h * y /100)
                 first_frame = first_frame.astype(np.uint8)
-                cv2.line(first_frame, (0, y_actual), (w, y_actual), color, thickness=2)
+                cv2.line(first_frame, (0, y_actual), (w, y_actual), color, thickness=5)
                 left_column.image(first_frame,use_column_width=True)
 
 
@@ -84,7 +85,7 @@ def main():
                     h, w= first_frame.shape[:2]
                     x_actual = int(w * x /100)
                     first_frame = first_frame.astype(np.uint8)
-                    cv2.line(first_frame, (x_actual, 0), (x_actual, h), color, thickness=2)
+                    cv2.line(first_frame, (x_actual, 0), (x_actual, h), color, thickness=5)
                     left_column.image(first_frame,use_column_width=True)
                     x1 = x_actual
                     y1 = h
@@ -95,7 +96,7 @@ def main():
                     h, w= first_frame.shape[:2]
                     y_actual = int(h * x /100)
                     first_frame = first_frame.astype(np.uint8)
-                    cv2.line(first_frame, (0, y_actual), (w, y_actual), color, thickness=2)
+                    cv2.line(first_frame, (0, y_actual), (w, y_actual), color, thickness=5)
                     left_column.image(first_frame,use_column_width=True)
                     x1 = w
                     y1 = y_actual
@@ -107,7 +108,7 @@ def main():
                     x_actual = int(w * x /100)
                     first_frame = first_frame.astype(np.uint8)
                     y_intercept = int(np.tan(np.radians(arg)) * x_actual)
-                    cv2.line(first_frame, (0, y_intercept), (x_actual, 0), color, thickness=2)
+                    cv2.line(first_frame, (0, y_intercept), (x_actual, 0), color, thickness=5)
                     y1 = y_intercept
                     left_column.image(first_frame,use_column_width=True)
 
@@ -119,7 +120,7 @@ def main():
                     first_frame = first_frame.astype(np.uint8)
                     y_intercept = int(-np.tan(np.radians(arg))*w+np.tan(np.radians(arg)) * x_actual)
                     print("here")
-                    cv2.line(first_frame, (w, y_intercept), (x_actual, 0), color, thickness=2)
+                    cv2.line(first_frame, (w, y_intercept), (x_actual, 0), color, thickness=5)
                     left_column.image(first_frame,use_column_width=True)
                     x1 = w
                     y1 = y_intercept
@@ -133,48 +134,77 @@ def main():
         elif mode == "長方形":
         # モード2の処理
             st.sidebar.write("領域は「長方形」で指定できます")
+            x = st.sidebar.slider('位置(横)', 0, 100, 50)
+            y = st.sidebar.slider('位置(縦)', 0, 100, 20)
+            width = st.sidebar.slider('長方形の横幅', 0, 100, 40)
+            height = st.sidebar.slider('長方形の高さ', 0, 100, 40)
             first_frame = get_first_frame(cap)
             h, w= first_frame.shape[:2]
-            # x_actual = int(w * x /100)
+            x_actual = int(w * x /100)
+            y_actual = int(h * y/100)
+            width_actual = int (w * width/100)
+            height_actual = int (h * height/100)
+
             first_frame = first_frame.astype(np.uint8)
+            cv2.rectangle(first_frame, (x_actual, y_actual), (x_actual + width_actual, y_actual + height_actual), color, thickness=2)
 
-            # Matplotlibのイベントを有効にし、画像上でマウスクリックイベントを取得する
-            fig = plt.figure()
-            plt.imshow(np.array(first_frame))
-            plt.axis('off')
-            cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
-            # MatplotlibのFigureオブジェクトをStreamlitのUIに表示する
-            st.pyplot(fig)
+            # 黒画像を生成します。
+            black = np.zeros_like(first_frame)
+            cv2.rectangle(black, (x_actual, y_actual), (x_actual + width_actual, y_actual + height_actual), (255, 255, 255), -1)
+
+            # 2値化します。
+            gray = cv2.cvtColor(black, cv2.COLOR_BGR2GRAY)
+            ret, thresh = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)
+
+            # 元の画像と黒画像を重ね合わせます。
+            result = cv2.bitwise_and(first_frame, black, mask=thresh)
+
+            # 元の画像と黒で塗りつぶされた画像を重ね合わせます。
+            alpha = 0.6
+            beta = 1 - alpha
+            result = cv2.addWeighted(first_frame, alpha, result, beta, 0)
+
+            left_column.image(result,use_column_width=True)
+        
             
+
+
              
         image_space = right_column.empty()
         frames, frames_len ,initial_size, boxes= track_object2(cap,image_space)
 
         st.subheader("判定")
         judge_space = st.empty()
-        for i in range (frames_len):
+        
 
-            #画像を連続で出力
-            frame = frames[i]
-            resized_frame = convert_frame(frame,initial_size)
-            image_space.image(resized_frame/255,use_column_width=True)
+        for y in range(30):
+            crossed = False
+            for i in range (frames_len):
 
-            if i !=0:
-                if mode == "線":
-                    if line_mode == "垂直":
-                        warning_line(line_mode,x_actual,None,boxes,i ,initial_size,judge_space,None,None)
+                #画像を連続で出力
+                frame = frames[i]
+                resized_frame = convert_frame(frame,initial_size)
+                image_space.image(resized_frame/255,use_column_width=True)
 
-                    if line_mode == "水平":
-                        warning_line(line_mode,None,y_actual,boxes,i ,initial_size,judge_space,None,None)
+                if i !=0:
+                    if mode == "線":
+                        if line_mode == "垂直":
+                            warning_line(line_mode,x_actual,None,boxes,i ,initial_size,judge_space,None,None,crossed)
 
-                    else:
-                        warning_line(line_mode,x_actual,y_actual,boxes,i ,initial_size,judge_space,x1,y1)
+                        if line_mode == "水平":
+                            warning_line(line_mode,None,y_actual,boxes,i ,initial_size,judge_space,None,None,crossed)
 
-                        
+                        else:
+                            if crossed == False:
+                                crossed = warning_line(line_mode,x_actual,y_actual,boxes,i ,initial_size,judge_space,x1,y1,crossed)
+                            else :
+                                judge_space.write("<p style='font-size: 20px; color: red; font-weight: bold; text-align: center;'>⚠️設定した線を超えました⚠️</p>", unsafe_allow_html=True)
+                    
+                    if mode == "長方形":
+                        warning_rectangle(x_actual,y_actual,width_actual,height_actual,boxes,i ,initial_size,judge_space)
 
-
-            time.sleep(0.05)
+                time.sleep(0.003)
 
 
         # フレームサイズを取得する
@@ -222,25 +252,6 @@ def upload_video_ui():
 
         else:
             return cap
-
-# マウスイベント用のコールバック関数
-def mouse_callback(event, x, y, flags, params):
-    if event == cv2.EVENT_LBUTTONUP:
-        # マウスの左ボタンが離された場合、クリックした座標を取得
-        points.append((x, y))
-        if len(points) == 4:
-            # 4点が選択された場合、4点の座標を表示
-            st.write("Selected points:", points)
-
-# 画像上でマウスをクリックしたときのイベントを処理する関数を作成する
-def onclick(event):
-    if len(points) < 4:
-        points.append((event.xdata, event.ydata))
-        plt.plot(event.xdata, event.ydata, 'ro')
-        plt.draw()
-        # 座標を表示する
-        st.text(points)
-
 
 if __name__ == '__main__':
     main()
