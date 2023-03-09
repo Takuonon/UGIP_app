@@ -14,7 +14,7 @@ def get_style():
     with open("./css/design.css") as f:
         return f.read()
 
-# #cssで装飾
+# #cssで装飾(最終的に未使用)
 # css = get_style()
 # st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
@@ -23,6 +23,8 @@ points = []
 
 
 def main():
+
+    # print("OpenCV version : ", cv2.__version__)
 
     with st.container():
         st.header("RailSentry")

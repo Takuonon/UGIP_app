@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from det_box import run
 
 def detect_object2(frame):
-# 画像を一時ファイルに保存
+#画像を一時ファイルに保存
 #変数の宣言
     x1 = 0
     y1 = 0
@@ -35,20 +35,8 @@ def detect_object2(frame):
     label = '%.2f' % confidence
     label = '%s: %s' % ("wheelchair", label)
     labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1) # fontScale: 0.5, thickness: 1
-    # print(labelSize, baseLine)
     left, top, width, height = box
-    # print("box",box)
-    # print(box[0])
-    # print(box[1])
-    # print(box[2])
-    # print(box[3])
-    # print(left)
-    # print(top)
-    # print(width)
-    # print(height)            
-    # print("T:", top)
     top = max(top, labelSize[1])
-    # print("MT:", top)
     print(box)
     print(box.shape)
     cv2.rectangle(frame, (int(box[0]), int(box[1])),(int(x2),int(y2)), color=(0, 255, 0), thickness=3)
@@ -59,53 +47,6 @@ def detect_object2(frame):
     cv2.putText(frame, label, (int(left), int(top)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
 
     return confidence, box, frame
-    
-
-
-
-# #arrayにした画像(frame)が引数
-# def detect_object(frame):
-#     cfg_path = os.path.abspath('yolo/yolov4.cfg')
-#     weights_path = os.path.abspath('yolo/yolov4.weights')
-#     names_path = os.path.abspath('yolo/coco.names')
-
-#     # モデルの作成
-#     net = cv2.dnn_DetectionModel(cfg_path, weights_path)
-#     net.setInputSize(704, 704)
-#     net.setInputScale(1.0 / 255)
-#     net.setInputSwapRB(True)
-
-#     #入力のサイズを調整
-#     frame = cv2.resize(frame, dsize=(704, 704), interpolation=cv2.INTER_AREA)
-
-#     # yolo/coco.namesを読み込む
-#     with open(names_path, 'rt') as f:
-#         names = f.read().rstrip('\n').split('\n')
-
-#     #classes: 検出された物体のクラスID
-#     #confidences: 精度(確率)
-#     #boxes: ボックス(左上x座標、左上y座標、幅、高さ)
-#     classes, confidences, boxes = net.detect(frame, confThreshold=0.1, nmsThreshold=0.4)
-
-#     for classId, confidence, box in zip(classes.flatten(), confidences.flatten(), boxes):
-#     #     print(classId, confidence, box)
-#         label = '%.2f' % confidence
-#         label = '%s: %s' % (names[classId], label)
-#         labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1) # fontScale: 0.5, thickness: 1
-#         # print(labelSize, baseLine)
-#         left, top, width, height = box
-#         # print("T:", top)
-#         top = max(top, labelSize[1])
-#         # print("MT:", top)
-#         cv2.rectangle(frame, box, color=(0, 255, 0), thickness=3)
-#         # Draw rectangle for labels
-#         cv2.rectangle(frame, (left, top - labelSize[1]), (left + labelSize[0], top + baseLine),
-#                       (255, 255, 255), cv2.FILLED)
-#         cv2.putText(frame, label, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
-
-#     # return frame
-#     return classes, confidences, boxes, frame
-
 
 def get_first_frame(cap):
     #TODO このせいでtrack_objectで読み込むフレームのスタート位置がズレてるかも
@@ -123,18 +64,18 @@ def get_first_frame(cap):
 
 def track_object2(cap, space):
     tracker = cv2.TrackerMIL_create()
-        # Exit if video not opened.
+    # Exit if video not opened.
     if not cap.isOpened():
         print ("Could not open video")
         sys.exit()
  
-    # Read first frame.
+    #Read first frame.
     ok, frame = cap.read()
     if not ok:
         print ('Cannot read video file')
         sys.exit()
 
-    #箱付きのiamgeを格納してく配列
+    #箱付きのiamgeを格納する配列
     frames = np.empty((50000,704, 704, 3))
     boxes_result = np.empty((50000,4))
 
