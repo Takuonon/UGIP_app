@@ -5,22 +5,9 @@ import numpy as np
 import cv2
 from detection.object_detection import track_object2, get_first_frame, convert_frame
 from warning.warning import warning_line, warning_rectangle
-import matplotlib.pyplot as plt
 
 #赤
 color = (255, 0, 0) 
-
-def get_style():
-    with open("./css/design.css") as f:
-        return f.read()
-
-# #cssで装飾(最終的に未使用)
-# css = get_style()
-# st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
-
-points = []
-
-
 
 def main():
 
@@ -208,28 +195,28 @@ def main():
 
                 time.sleep(0.003)
 
+    #bounding boxをつけた動画を保存する機能(コメントアウトを外せば多分動きます)
+        # # フレームサイズを取得する
+        # height, width, channels = frames[0].shape
+        # print(height,width)
 
-        # フレームサイズを取得する
-        height, width, channels = frames[0].shape
-        print(height,width)
+        # # 動画ファイルの書き込み準備
+        # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        # out = cv2.VideoWriter('output.mp4', fourcc, 10.0, (width, height))
 
-        # 動画ファイルの書き込み準備
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter('output.mp4', fourcc, 10.0, (width, height))
+        # #TODO rectangleは単純に倍率かければいける
 
-        #TODO rectangleは単純に倍率かければいける
+        # # フレームを動画ファイルに書き込む
+        # for i in range(frames_len):
+        #     frame = (frames[i])
+        #     frame = cv2.convertScaleAbs(frame)
+        #     out.write(frame)
 
-        # フレームを動画ファイルに書き込む
-        for i in range(frames_len):
-            frame = (frames[i])
-            frame = cv2.convertScaleAbs(frame)
-            out.write(frame)
+        # # 動画ファイルを閉じる
+        # out.release()
 
-        # 動画ファイルを閉じる
-        out.release()
-
-        #TODO output.mp4をダウンロード
-        st.download_button('Download file', data = "output.mp4", mime="video/mp4")
+        # #TODO output.mp4をダウンロード
+        # st.download_button('Download file', data = "output.mp4", mime="video/mp4")
 
 
 def upload_video_ui():
