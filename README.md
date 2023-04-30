@@ -14,7 +14,16 @@
 
 ## その他
 
-best.pt、yolo4.weights は以下のリンクからダウンロードが可能です
+### 必要ファイルについて
+
+アプリを動作させる上で必要な best.pt、yolo4.weights はレポジトリに含まれていません。
+
+```
+make download
+```
+
+で適切な階層にダウンロード可能です。
+もし動作しない場合はは以下のリンクから直接ダウンロードしてください。
 
 - https://drive.google.com/drive/folders/1MheAP7o6INpj1pKUrp8CCwCZXJecN9ZQ?usp=sharing
 
@@ -25,12 +34,22 @@ best.pt、yolo4.weights は以下のリンクからダウンロードが可能�
 
 となるようにそれぞれ配置して下さい。
 
+### 必要モジュールについて
+
+仮想環境中で
+
+```
+make install
+```
+
+することで必要モジュールを requirements.txt からダウンロード可能です。
+
+### アプリの実行について
+
 アプリを実行する際は
 
 ```
-streamlit run app.py
+make start
 ```
 
 で localhost が立ちます
-
-その他詳細はモックアップ資料をご確認下さい
