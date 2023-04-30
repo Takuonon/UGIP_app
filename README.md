@@ -18,7 +18,7 @@
 
 1. python3.10 の仮想環境を作って立ち上げる
 
-python3.8 ~ 3.10 で仮想環境を作ってください。これ以外のバージョンだとモジュールをインストールする際にエラーが発生してしまします。(python3.10 で動作確認済み)参考に自身の mac 上のコマンドを添付します。必要であれば、python3.10 がインストールすることを忘れないでください。[Python3.10.11 のダウンロードリンク](https://www.python.org/downloads/release/python-31011/)
+python3.8 ~ 3.10 で仮想環境を作ってください。これ以外のバージョンだとモジュールをインストールする際にエラーが発生してしまします。(python3.10 で動作確認済み)参考に自身の mac 上のコマンドを添付します。必要であれば、python3.10 のインストールを忘れないでください。[Python3.10.11 のダウンロードリンク](https://www.python.org/downloads/release/python-31011/)
 
 ```
 $ python3.10 -m venv env_Railway
@@ -28,7 +28,7 @@ $ source env_Railway/bin/activate
 2. 必要モジュールをインストールする
 
 ```
-make install
+$ make install
 ```
 
 することで必要モジュールを requirements.txt からダウンロード可能です。
@@ -38,7 +38,7 @@ make install
 アプリを動作させる上で必要な best.pt、yolo4.weights はレポジトリに含まれていません。
 
 ```
-make download
+$ make download
 ```
 
 で適切な階層にダウンロード可能です。
@@ -58,5 +58,5 @@ make download
 以下のコマンドでローカルホストが立ち上がります。
 
 ```
-make run
+$ make run
 ```
