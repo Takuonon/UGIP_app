@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    # イメージ名を指定
+    image: streamlit
+    ports:
+      - 8501:8501
+    # localとcontainer間のファイルを同期させる
+    # ${local}:${container}
+    volumes:
+      - .:/app
