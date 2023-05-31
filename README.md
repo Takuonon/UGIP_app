@@ -16,47 +16,33 @@
 
 以下の順番に従って実行して下さい
 
-1. python3.10 の仮想環境を作って立ち上げる
+1. 必要ファイルをインストールする
 
-   python3.8 ~ 3.10 で仮想環境を作ってください。これ以外のバージョンだとモジュールをインストールする際にエラーが発生してしまします。(python3.10 で動作確認済み)参考に自身の mac 上のコマンドを添付します。必要であれば、python3.10 のインストールを忘れないでください。[Python3.10.11 のダウンロードリンク](https://www.python.org/downloads/release/python-31011/)
-
-   ```
-   $ python3.10 -m venv env_Railway
-   $ source env_Railway/bin/activate
-   ```
-
-2. 必要モジュールをインストールする
-
-   ```
-   $ make install
-   ```
-
-   することで必要モジュールを requirements.txt からダウンロード可能です。
-
-3. 必要ファイルをインストールする
-
-   アプリを動作させる上で必要な best.pt、yolo4.weights はレポジトリに含まれていません。
+   アプリを動作させる上で必要な best.pt はレポジトリに含まれていません。
 
    ```
    $ make download
    ```
 
-   で適切な階層にダウンロード可能です。
-   もし上のコードで正しく動作しない場合は、以下のリンクから直接ダウンロードしてください。
+   で適切な階層にダウンロード可能です。(MacBook Pro M1 チップ macOS: 13.3.1 で動作)
+   上のコマンドが正しく動作しない場合は、以下のリンクから直接ダウンロードしてください。
 
    - https://drive.google.com/drive/folders/1MheAP7o6INpj1pKUrp8CCwCZXJecN9ZQ?usp=sharing
 
    その際は
 
    - weights_folder/best.pt
-   - yolo/yolov4.weights
 
-   となるようにそれぞれ配置して下さい。
+   となるように配置して下さい。
 
-4. ローカル環境でアプリを立ち上げる
+2. Docker でアプリを立ち上げる
 
-   以下のコマンドでローカルホストが立ち上がります。
+   以下のコマンドで Docker 環境が立ち上がります。
 
    ```
-   $ make run
+   $ docker-compose up
    ```
+
+## 謝辞
+
+環境構築やデバックを手伝って頂いた Axross Recipe チームの方々に感謝申し上げます。
