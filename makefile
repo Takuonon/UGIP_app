@@ -1,35 +1,13 @@
 .ONESHELL:
-# Path to the requirement.txt file
-REQUIREMENTS_FILE = requirements.txt
 
-# Command to install packages using pip
-CONDA_INSTALL_PACKAGES = pip install -r $(REQUIREMENTS_FILE)
+# Google Drive file ID
+FILE_ID = 1fGEJ3QQLqCWHUbfmBY7pEOT7Q4nWD5pc
 
-# Google Drive file ID and URL
-FILE_ID_pt = 1fGEJ3QQLqCWHUbfmBY7pEOT7Q4nWD5pc
-FILE_URL_pt = "https://drive.google.com/uc?id=$(FILE_ID_pt)"
-# Path to save the downloaded file
-DOWNLOAD_PATH_pt = ./weights_folder/best.pt
-# Command to download file from Google Drive and save it to specified path
-DOWNLOAD_FILE_pt = wget --no-check-certificate $(FILE_URL_pt) -O $(DOWNLOAD_PATH_pt)
-
-# Google Drive file ID and URL
-FILE_ID_weights = 1CvnoffsL81Z-2gV1HzfJ30P3QBQnjmsG
-FILE_URL_weights = "https://drive.google.com/uc?id=$(FILE_ID_weights)"
-# Path to save the downloaded file
-DOWNLOAD_PATH_weights = ./yolo/yolov4.weights
-# Command to download file from Google Drive and save it to specified path
-DOWNLOAD_FILE_weights = wget --no-check-certificate $(FILE_URL_weights) -O $(DOWNLOAD_PATH_weights)
-
-install:
-	$(CONDA_INSTALL_PACKAGES)
+FILE_NAME = ./weights_folder/best.pt
+PREDOWNLOAD_FILE = curl -sc /tmp/cookie "https://drive.google.com/uc?export=download&id=${FILE_ID}" > /dev/null
+CODE="$(awk '/_warning_/ {print $NF}' /tmp/cookie)"
+DOWNLOAD_FILE = curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${CODE}&id=${FILE_ID}" -o ${FILE_NAME}
 
 download:
-	mkdir weights_folder
-	$(DOWNLOAD_FILE_pt)
-	$(DOWNLOAD_FILE_weights)	
-
-run:
-	streamlit run app.py
-
-start: install download run
+	$(PREDOWNLOAD_FILE)
+	$(DOWNLOAD_FILE)
