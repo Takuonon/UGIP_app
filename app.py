@@ -10,9 +10,6 @@ from warning.warning import warning_line, warning_rectangle
 color = (255, 0, 0) 
 
 def main():
-
-    # print("OpenCV version : ", cv2.__version__)
-
     with st.container():
         st.header("RailSentry")
     status_space = st.sidebar.empty()
@@ -36,11 +33,8 @@ def main():
         x1 = 0
         y1 = 0
 
-
-
         # 選択されたモードに応じて動作を変更
         if mode == "線":
-        # モード1の処理
             st.sidebar.write("「線」を描画して下さい")
             line_mode = st.sidebar.radio("線タイプ",["垂直","水平","その他"])
 
@@ -66,7 +60,7 @@ def main():
             if line_mode == "その他":
                 x = st.sidebar.slider('位置', 0, 100, 50)  
                 arg = st.sidebar.slider('角度', -180, 0, -125)
-                #視覚的なわかりやすさのためにこうした
+                #視覚的な分かりやすさのためにこうした
                 arg += 180
                 #arg == 90 の時は垂直と同じ操作
                 if arg == 90:
@@ -114,14 +108,8 @@ def main():
                     x1 = w
                     y1 = y_intercept
 
-                print(x1)
-                print(y1)
-                # while True:
-                #     time.sleep(1)
-
 
         elif mode == "長方形":
-        # モード2の処理
             st.sidebar.write("領域は「長方形」で指定できます")
             x = st.sidebar.slider('位置(横)', 0, 100, 50)
             y = st.sidebar.slider('位置(縦)', 0, 100, 20)
@@ -136,7 +124,6 @@ def main():
 
             first_frame = first_frame.astype(np.uint8)
             cv2.rectangle(first_frame, (x_actual, y_actual), (x_actual + width_actual, y_actual + height_actual), color, thickness=2)
-
 
             # 黒画像を生成します。
             black = np.zeros_like(first_frame)
@@ -154,18 +141,13 @@ def main():
             beta = 1 - alpha
             result = cv2.addWeighted(first_frame, alpha, result, beta, 0)
 
-            left_column.image(result,use_column_width=True)
-        
-            
-
-
+            left_column.image(result,use_column_width=True)                    
              
         image_space = right_column.empty()
         frames, frames_len ,initial_size, boxes= track_object2(cap,image_space)
 
         st.subheader("判定")
         judge_space = st.empty()
-        
 
         for y in range(30):
             crossed = False
@@ -222,10 +204,6 @@ def main():
 def upload_video_ui():
     uploaded_video = st.file_uploader("Upload Video", type=["mp4", "mov", "avi"], key="file_uploader")
     
-    # while uploaded_video is None:
-    #     time.sleep(1)
-
-
     if uploaded_video is not None:
         try:
             with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
@@ -238,7 +216,6 @@ def upload_video_ui():
             st.write("Error: {}".format(str(e)))
             st.error("Error: Invalid video")
         #tryブロックでエラーが発生しなかった場合はelseが実行される
-
         else:
             return cap
 
