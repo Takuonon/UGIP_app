@@ -43,6 +43,12 @@
    $ docker-compose up
    ```
 
+## 動画ファイル
+
+上の gif 動画で実際に使用している動画ファイルは以下のリンクからダウンロード可能です。
+
+- https://drive.google.com/file/d/1obTN2oNNVTEVjRBwMSoc2SRHZIW9dPTU/view?usp=drive_link
+
 ## 謝辞
 
 環境構築やデバックを手伝って頂いた Axross Recipe チームの方々に感謝申し上げます。
